@@ -1,8 +1,11 @@
 # Remem
 
-**Re** (in Act) + **Mem** (ory) — persistent memory layer for AI coding agents on top of the [Re in Act](https://re-in-act.org) specification.
+**Re** (in Act) + **Mem** (ory) — persistent memory system for **AI Engineers** running on Claude Code / OpenCode.
 
-Built on the `.agents/` standard, with zero databases. All memory is plain Markdown files.
+Built on the [Re in Act](https://re-in-act.org) spec and the `.agents/` standard.
+Zero databases. All memory is plain Markdown files.
+
+> An AI Engineer is more than a coding agent. It knows the codebase, the team, and past decisions — and gets better over time.
 
 ## Quick Start
 
