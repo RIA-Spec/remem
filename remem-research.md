@@ -2,7 +2,8 @@
 
 > Research date: 2026-05-30
 > Subjects: Devin AI, OpenCLAW, Hermes Agent, Mem0, Claude Code, OpenCode
-> Updated: 2026-05-31
+> Updated: 2026-06-02
+> Supplement: Mem0 "State of Memory in Agent Harness" analysis
 
 ---
 
@@ -381,9 +382,68 @@ OpenCode has **no built-in memory system**. Entirely community-plugin driven.
 
 ---
 
-## 9. Final Conclusions
+## 9. Supplement: State of Memory in Agent Harness (Mem0, June 2026)
 
-### 9.1 Key Takeaways from Each System
+### Source
+
+Mem0's X article comparing memory handling across major agent harnesses:
+Cursor, Devin, Claude Code, Codex.
+
+### Core Argument
+
+Agent harnesses are where AI code actually runs. They handle context,
+orchestrate tools, coordinate agents, and increasingly manage memory.
+But each does memory differently, and the differences reveal where the
+ecosystem is heading.
+
+### Five Harnesses, Five Approaches
+
+| Harness | Memory Model | Key Tradeoff |
+|---|---|---|
+| **Cursor** | Inline in chat + `.cursorrules` | Simple, agent-controlled, no automatic cross-session persistence |
+| **Codex** | `AGENTS.md` + auto-memory in `.codex/memory/` | Standardized rules file, auto-memory still limited |
+| **Claude Code** | Auto Memory (4 types, 200-line index, Sonnet side-query) | Best curation, worst retrieval (keyword-only, max 5 files) |
+| **Devin** | Proprietary layered memory (undisclosed) | Best integration, closed and unreproducible |
+| **Gemini CLI** | `GEMINI.md` + minimal built-in | Least memory capability, relies on long context |
+
+### Key Insight: Harness Lock-In
+
+Each harness's memory is tightly coupled to its runtime:
+
+- Claude Code's frozen snapshot optimizes for Anthropic's prefix caching
+- Devin's memory is inseparable from its planner
+- Cursor's memory is embedded in chat UX
+- Codex's memory is tied to its agent protocol
+
+**Switching harnesses loses your memory.** There is no portable memory layer
+that works across harnesses. That is the gap Remem fills.
+
+### The Control Plane View
+
+Memory quality is a **control problem, not a storage problem**. What matters:
+
+1. **What enters memory** — extraction quality, dedup, priority
+2. **What survives compaction** — pruning policy, contradiction resolution
+3. **What gets retrieved** — search quality, relevance ranking
+4. **What gets forgotten** — expiry, staleness detection
+
+These are harness-runtime decisions, not vector-database decisions.
+
+### What This Means for Remem
+
+| Finding | Implication |
+|---|---|
+| Harness lock-in is real | Remem must be harness-agnostic via ACP. Independent of Claude Code / Codex internal memory |
+| Memory = control problem | Our prompts (extract-facts, dream, init) are the core product, not the file format |
+| Claude Code's retrieval is weakest | L2 vector search is the right gap to fill |
+| Skills missing everywhere | L4 skills are a genuine differentiator |
+| No harness supports cross-session team memory | TEAM.md + People/ is unique in the ecosystem |
+
+---
+
+## 10. Final Conclusions
+
+### 10.1 Key Takeaways from Each System
 
 | System | Best lesson | Pitfall to avoid |
 |---|---|---|
