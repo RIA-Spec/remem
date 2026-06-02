@@ -1,0 +1,31 @@
+{
+  "name": "remem",
+  "version": "0.1.0",
+  "description": "Re(in Act) + Mem(ory) — persistent memory layer for AI Engineers",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "remem": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@mcpc-tech/acp-ai-provider": "^0.1.20",
+    "ai": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RIA-Spec/remem.git"
+  },
+  "license": "MIT"
+}
