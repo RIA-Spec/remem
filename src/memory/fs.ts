@@ -10,7 +10,7 @@ export interface MemoryLimits {
 export const LIMITS: Record<string, MemoryLimits> = {
   'MEMORY.md': { maxChars: 5000, maxLines: 200 },
   'TEAM.md':   { maxChars: 3000, maxLines: 100 },
-  'USER.md':   { maxChars: 2000, maxLines: 80 },
+  'SOUL.md':   { maxChars: 2000, maxLines: 80 },
 }
 
 export interface WriteResult {
@@ -74,7 +74,7 @@ export async function ensureStructure(cwd?: string): Promise<void> {
   await Promise.all(dirs.map(d => ensureDir(d)))
 
   // Ensure default memory files exist
-  for (const name of ['MEMORY.md', 'TEAM.md', 'USER.md']) {
+  for (const name of ['MEMORY.md', 'TEAM.md', 'SOUL.md']) {
     const path = memoryFilePath(name, cwd)
     if (!existsSync(path)) {
       await writeFile(path, '', 'utf-8')

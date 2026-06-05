@@ -51,7 +51,7 @@ export class Orchestrator {
   async preloadContext(): Promise<Record<string, string>> {
     await this.emit({ phase: 'preload', action: 'start', timestamp: ts() })
     try {
-      const files = ['MEMORY.md', 'TEAM.md', 'USER.md']
+      const files = ['MEMORY.md', 'TEAM.md', 'SOUL.md']
       const result: Record<string, string> = {}
       for (const f of files) {
         result[f] = await readMemory(f, this.config.cwd)

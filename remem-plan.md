@@ -17,7 +17,7 @@ User request
 ┌──────────────────────────────────────────────────┐
 │               Orchestration Layer (us)            │
 │                                                   │
-│  1. Preload L3 facts (MEMORY.md / USER.md /      │
+│  1. Preload L3 facts (MEMORY.md / SOUL.md /      │
 │     TEAM.md → inject into context)                │
 │  2. Call Agent via ACP (Claude Code / OpenCode)  │
 │  3. Agent returns trajectory                      │
@@ -44,22 +44,21 @@ User request
 ## 2. Directory Structure
 
 ```
-.agents/
-├── memory/                         ← L3 semantic memory
-│   ├── MEMORY.md                   ─ Project facts (always injected, 5K chars / 200 lines)
-│   ├── TEAM.md                     ─ Organization facts (always injected, 3K chars / 100 lines)
-│   ├── USER.md                     ─ Current user preferences (always injected, 2K chars / 80 lines)
-│   ├── People/                     ─ Per-person knowledge (lazy loaded, uncapped)
-│   │   ├── alice.md
-│   │   └── bob.md
-│   └── Sessions/                   ─ Episodic memory (on-demand search, uncapped)
-│       ├── alice/
-│       │   ├── 2026-05-30.md
-│       │   └── 2026-05-31.md
-│       └── bob/
-│           ├── 2026-05-29.md
-│           └── 2026-05-31.md
-└── skills/                         ─ L4 procedural memory (lazy loaded)
+~/.remem/                          ← Global (cross-project)
+├── SOUL.md                        ─ AI engineer identity (always injected, 2K chars / 80 lines)
+├── MEMORY.md                      ─ General lessons & conventions (always injected, 3K chars / 120 lines)
+├── TEAM.md                        ─ Organization topology (always injected, 3K chars / 100 lines)
+├── People/                        ─ Per-person knowledge (lazy loaded)
+│   ├── alice.md
+│   └── bob.md
+├── Sessions/                      ─ Episodic memory (on-demand search, uncapped)
+│   ├── alice/
+│   │   ├── 2026-05-30.md
+│   │   └── 2026-05-31.md
+│   └── bob/
+│       ├── 2026-05-29.md
+│       └── 2026-05-31.md
+└── skills/                        ─ L4 procedural memory (lazy loaded)
     ├── db-migration/
     │   └── SKILL.md
     └── deploy/
@@ -98,7 +97,7 @@ At the start of each session, read the following files for project context:
 
 - `.agents/memory/MEMORY.md` — project facts and conventions
 - `.agents/memory/TEAM.md` — team topology and workflow
-- `.agents/memory/USER.md` — current user preferences
+- `.agents/memory/SOUL.md` — current user preferences
 
 ## Session Search
 
@@ -136,9 +135,10 @@ Three files are read and injected at session start, **frozen for the entire sess
 
 | File | Cap | Write policy | On full |
 |---|---|---|---|
-| `MEMORY.md` | 5,000 chars / 200 lines | Check before write | Return error + current entries, AI decides replacement |
+| `MEMORY.md` (global) | 3,000 chars / 120 lines | Check before write | Return error + current entries, AI decides replacement |
+| `MEMORY.md` (project) | 3,000 chars / 120 lines | Same | Same |
 | `TEAM.md` | 3,000 chars / 100 lines | Same | Same |
-| `USER.md` | 2,000 chars / 80 lines | Same | Same |
+| `SOUL.md` | 2,000 chars / 80 lines | Same | Same |
 
 **Frozen snapshot mechanism** (inspired by Hermes):
 
@@ -156,11 +156,11 @@ Next session → read latest → new snapshot
 | `Sessions/` | Agent runs session search |
 | `skills/` | Task matches skill description |
 
-### USER.md identity
+### SOUL.md identity
 
 The AI engineer is a background service, not a human user:
 
-- USER.md is the **AI engineer's own identity**, no dynamic switching
+- SOUL.md is the **AI engineer's own identity**, no dynamic switching
 - People/ stores the AI engineer's **knowledge of other team members**
 - Current user detection: `$AI_USER` → `git config user.name`
 
@@ -217,7 +217,7 @@ The Agent may edit `.agents/memory/` files freely — `read` + `edit` / `write` 
 
 One rule: **check capacity before writing to context-injected files**.
 
-For MEMORY.md / TEAM.md / USER.md:
+For MEMORY.md / TEAM.md / SOUL.md:
 
 - Check current size before writing
 - If full, do not silently discard: merge old entries to make room, or flag for Dream to handle
@@ -253,7 +253,7 @@ Priority labels `[P0]`-`[P4]` guide AI decisions but are not hard rules:
 
 ### 6.3 Security scan
 
-Content written to MEMORY.md / TEAM.md / USER.md is scanned for:
+Content written to MEMORY.md / TEAM.md / SOUL.md is scanned for:
 
 - Prompt injection attempts
 - Role hijacking
@@ -334,7 +334,7 @@ Step 6 — Stage skill candidates
 
 | | Strategy A (context-injected) | Strategy B (lazy loaded) |
 |---|---|---|
-| Target files | MEMORY.md, TEAM.md, USER.md | People/, Sessions/, skills/ |
+| Target files | MEMORY.md, TEAM.md, SOUL.md | People/, Sessions/, skills/ |
 | Capacity check | Strict, reject if full | None |
 | Pre-write validation | Capacity + security scan | Security scan only |
 | Principle | Quality first | Quantity first |
@@ -400,7 +400,7 @@ Scheduled by orchestrator. Dream process:
 | **P3** | Sessions auto-write | ACP post-processing Step 1 | P2 |
 | **P4** | Fact extraction | ACP post-processing Step 2, call Agent with extract-facts.md | P2 |
 | **P5** | Fact write logic | Post-processing Steps 3-6, orchestration writes from JSON | P4 |
-| **P6** | Security scan | Pre-write scan for MEMORY.md/TEAM.md/USER.md | P5 |
+| **P6** | Security scan | Pre-write scan for MEMORY.md/TEAM.md/SOUL.md | P5 |
 | **P7** | People auto-extraction | Post-processing Step 5 | P4 |
 | **P8** | Skill detection | Pattern recognition + user confirmation flow | P4 |
 | **P9** | Dream consolidation | Scheduled ACP call with dream.md | P1-P8 |
